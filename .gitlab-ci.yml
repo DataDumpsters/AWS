@@ -1,119 +1,119 @@
-# image: 
-#   name: hashicorp/terraform:1.5.0
-#   entrypoint: [""]
-#   # Adding Docker-in-Docker service
+# # image: 
+# #   name: hashicorp/terraform:1.5.0
+# #   entrypoint: [""]
+# #   # Adding Docker-in-Docker service
 
-include:
-  - template: Terraform/Base.gitlab-ci.yml  # https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Terraform/Base.gitlab-ci.yml
-  #- template: Jobs/SAST-IaC.gitlab-ci.yml   # https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Jobs/SAST-IaC.gitlab-ci.yml
+# include:
+#   - template: Terraform/Base.gitlab-ci.yml  # https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Terraform/Base.gitlab-ci.yml
+#   #- template: Jobs/SAST-IaC.gitlab-ci.yml   # https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Jobs/SAST-IaC.gitlab-ci.yml
 
-variables:
-  TF_VAR_DB_USERNAME: "$DB_USERNAME"
-  TF_VAR_DB_PASSWORD: "$DB_PASSWORD"
-  TF_VAR_AWS_LABROLE_ARN: "$AWS_LABROLE_ARN"
-  TF_VAR_AWS_ECR_ENDPOINT: "$AWS_ECR_ENDPOINT"
-  TF_VAR_AWS_REPO_URI: "$AWS_REPO_URI"
+# variables:
+#   TF_VAR_DB_USERNAME: "$DB_USERNAME"
+#   TF_VAR_DB_PASSWORD: "$DB_PASSWORD"
+#   TF_VAR_AWS_LABROLE_ARN: "$AWS_LABROLE_ARN"
+#   TF_VAR_AWS_ECR_ENDPOINT: "$AWS_ECR_ENDPOINT"
+#   TF_VAR_AWS_REPO_URI: "$AWS_REPO_URI"
 
-stages:
-  - Build and Push
-  - validate
-  - build
-  - deploy
-  - test
-  - webhook
-  - cleanup
+# stages:
+#   - Build and Push
+#   - validate
+#   - build
+#   - deploy
+#   - test
+#   - webhook
+#   - cleanup
 
-Build and Push:  
-  stage: Build and Push  
-  image: docker:25.0.4
-  services:
-    - docker:25.0.4-dind
-  script:
-    - apk add python3
-    - apk add py3-pip
-    - python3 -m venv venv
-    - source venv/bin/activate
-    - pip3 install awscli
-    - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ECR_ENDPOINT}
-    - docker build -t le-repo application/crudapp/.
-    - docker tag le-repo:latest ${AWS_REPO_URI}:latest
-    - docker push ${AWS_REPO_URI}:latest
-
-validate:
-  extends: .terraform:validate
-  needs: []
-
-build:
-  extends: .terraform:build
-  environment:
-    name: $TF_STATE_NAME
-    action: prepare
-
-deploy:
-  extends: .terraform:deploy
-  dependencies:
-    - build
-  environment:
-    name: $TF_STATE_NAME
-    action: start
-
-### Deze teststage toont: de aws versie, de 2 tasks die actief zijn 
-###    een curl naar de dns load balancer                    
-test:
-  stage: test
-  image: 
-     name: amazon/aws-cli:2.15.23
-     entrypoint: [""]
-  script:
-    - aws --version
-    - aws ecs list-tasks --cluster le_fargate_cluster2 
-    - yum install -y jq
-    - dns_name=$(aws elbv2 describe-load-balancers --names le-alb | jq -r '.LoadBalancers[0].DNSName')
-    - echo "DNS name retrieved $dns_name"
-    - curl "$dns_name"  # request naar de dns naam van de load balancer
-    - if curl -s --head "$dns_name" | head -n 1 | grep "HTTP/1.[01] [23].." > /dev/null; then echo "Website up and running"; else echo "Website not reachable"; fi
-
-webhook:
-  stage: webhook
-  image:
-    name: python:3.9
-  script:
-    - pip install requests
-    - python webhook.py
-
-
-destroy:
-  extends: .terraform:destroy
-  environment:
-    name: $TF_STATE_NAME
-    action: stop
-  when: manual
-
-
-# terraform_init:
-#   stage: init
+# Build and Push:  
+#   stage: Build and Push  
+#   image: docker:25.0.4
+#   services:
+#     - docker:25.0.4-dind
 #   script:
-#     - terraform init -upgrade 
+#     - apk add python3
+#     - apk add py3-pip
+#     - python3 -m venv venv
+#     - source venv/bin/activate
+#     - pip3 install awscli
+#     - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ECR_ENDPOINT}
+#     - docker build -t le-repo application/crudapp/.
+#     - docker tag le-repo:latest ${AWS_REPO_URI}:latest
+#     - docker push ${AWS_REPO_URI}:latest
 
-# terraform_validate:
-#   stage: validate
-#   script:
-#     - terraform init
-#     - terraform validate
+# validate:
+#   extends: .terraform:validate
+#   needs: []
 
-# terraform_plan:
-#   stage: plan
-#   script:
-#     - terraform init
-#     - terraform plan 
+# build:
+#   extends: .terraform:build
+#   environment:
+#     name: $TF_STATE_NAME
+#     action: prepare
 
-# terraform_apply:
-#   stage: apply
+# deploy:
+#   extends: .terraform:deploy
+#   dependencies:
+#     - build
+#   environment:
+#     name: $TF_STATE_NAME
+#     action: start
+
+# ### Deze teststage toont: de aws versie, de 2 tasks die actief zijn 
+# ###    een curl naar de dns load balancer                    
+# test:
+#   stage: test
+#   image: 
+#      name: amazon/aws-cli:2.15.23
+#      entrypoint: [""]
 #   script:
-#     - terraform init
-#     - terraform apply -auto-approve
+#     - aws --version
+#     - aws ecs list-tasks --cluster le_fargate_cluster2 
+#     - yum install -y jq
+#     - dns_name=$(aws elbv2 describe-load-balancers --names le-alb | jq -r '.LoadBalancers[0].DNSName')
+#     - echo "DNS name retrieved $dns_name"
+#     - curl "$dns_name"  # request naar de dns naam van de load balancer
+#     - if curl -s --head "$dns_name" | head -n 1 | grep "HTTP/1.[01] [23].." > /dev/null; then echo "Website up and running"; else echo "Website not reachable"; fi
+
+# webhook:
+#   stage: webhook
+#   image:
+#     name: python:3.9
+#   script:
+#     - pip install requests
+#     - python webhook.py
+
+
+# destroy:
+#   extends: .terraform:destroy
+#   environment:
+#     name: $TF_STATE_NAME
+#     action: stop
 #   when: manual
 
-#  fmt:
-#    extends: .terraform:fmt
-#    needs: []
+
+# # terraform_init:
+# #   stage: init
+# #   script:
+# #     - terraform init -upgrade 
+
+# # terraform_validate:
+# #   stage: validate
+# #   script:
+# #     - terraform init
+# #     - terraform validate
+
+# # terraform_plan:
+# #   stage: plan
+# #   script:
+# #     - terraform init
+# #     - terraform plan 
+
+# # terraform_apply:
+# #   stage: apply
+# #   script:
+# #     - terraform init
+# #     - terraform apply -auto-approve
+# #   when: manual
+
+# #  fmt:
+# #    extends: .terraform:fmt
+# #    needs: []
