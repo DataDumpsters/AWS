@@ -1,0 +1,6 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main  # Dit zorgt ervoor dat de workflow draait bij elke push naar de main branch.
