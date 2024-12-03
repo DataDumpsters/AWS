@@ -43,4 +43,8 @@ jobs:
         run: tofu init
 
       - name: Apply OpenTofu configuration
-        run: tofu apply -auto-approve
+        run: |
+          tofu apply -auto-approve \
+            -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" \
+            -var "aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+            -var "aws_token=${{ secrets.AWS_SESSION_TOKEN }}"
