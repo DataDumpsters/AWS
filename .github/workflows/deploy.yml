@@ -17,7 +17,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y snapd
-          sudo snap install opentofu
+          sudo snap install opentofu --classic  # Voeg de --classic vlag toe
 
       - name: Add snap binary path to PATH
         run: |
