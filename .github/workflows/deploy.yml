@@ -1,6 +1,44 @@
-name: Deploy to AWS
+name: Deploy to AWS with OpenTofu
 
 on:
   push:
     branches:
-      - main  # Dit zorgt ervoor dat de workflow draait bij elke push naar de main branch.
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to AWS with OpenTofu
+    runs-on: ubuntu-latest
+
+    steps:
+    # Stap 1: Check out de repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Stap 2: Installeer OpenTofu
+    - name: Setup OpenTofu
+      run: |
+        curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+        sudo apt update && sudo apt install opentofu
+
+    # Stap 3: Configureer AWS credentials
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: us-east-1 # Pas dit aan naar jouw regio
+
+    # Stap 4: Initialiseer OpenTofu
+    - name: OpenTofu Init
+      run: opentofu init
+
+    # Stap 5: Plan OpenTofu
+    - name: OpenTofu Plan
+      run: opentofu plan -out=tfplan
+
+    # Stap 6: Apply OpenTofu
+    - name: OpenTofu Apply
+      run: opentofu apply -auto-approve tfplan
