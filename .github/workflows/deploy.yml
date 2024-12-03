@@ -37,7 +37,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: us-west-2  # Gebruik de juiste parameter voor regio
+          aws-region: us-east-1  # Gebruik de juiste parameter voor regio
 
       - name: Run OpenTofu init
         run: tofu init
