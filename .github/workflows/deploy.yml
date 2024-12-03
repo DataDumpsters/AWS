@@ -3,28 +3,33 @@ name: Deploy to AWS with OpenTofu
 on:
   push:
     branches:
-      - main  # Zorg ervoor dat de workflow wordt uitgevoerd bij elke push naar de main branch.
+      - main
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest  # Zorg ervoor dat de job op een Ubuntu runner draait.
+    runs-on: ubuntu-latest
 
     steps:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Install dependencies
+      - name: Install snapd
         run: |
           sudo apt-get update
           sudo apt-get install -y snapd
-          sudo snap install opentofu --classic  # Voeg de --classic vlag toe
+          sudo systemctl enable --now snapd.socket
+          sudo snap install opentofu --classic
 
-      - name: Add snap binary path to PATH
+      - name: Verify snap installation path
         run: |
-          echo "/snap/bin" >> $GITHUB_PATH  # Zorg ervoor dat de snap binaries in de PATH zitten
+          echo "Snap bin path: $PATH"  # Debugging de path
+          echo "/snap/bin" >> $GITHUB_PATH
+          ls /snap/bin  # Bekijk of tofu daar aanwezig is
 
       - name: Verify OpenTofu installation
-        run: opentofu --version
+        run: |
+          which tofu  # Controleer of tofu gevonden kan worden in het pad
+          tofu --version  # Bekijk de versie van OpenTofu
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
@@ -32,12 +37,10 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          region: us-west-2  # Verander dit naar jouw gewenste regio
+          region: us-west-2
 
       - name: Run OpenTofu init
-        run: |
-          opentofu init
+        run: tofu init
 
       - name: Apply OpenTofu configuration
-        run: |
-          opentofu apply -auto-approve
+        run: tofu apply -auto-approve
