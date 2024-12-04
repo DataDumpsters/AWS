@@ -10,11 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Stap 1: Checkout de code
       - name: Check out code
         uses: actions/checkout@v3
 
-      # Stap 2: Installeer OpenTofu via snap
       - name: Install snapd and OpenTofu
         run: |
           sudo apt-get update
@@ -22,13 +20,11 @@ jobs:
           sudo systemctl enable --now snapd.socket
           sudo snap install opentofu --classic
 
-      # Stap 3: Controleer de installatie van OpenTofu
       - name: Verify OpenTofu installation
         run: |
           which tofu
           tofu --version
 
-      # Stap 4: Configureer AWS credentials als environment-variabelen
       - name: Configure AWS credentials
         env:
           AWS_REGION: "us-east-1"
@@ -37,19 +33,18 @@ jobs:
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: echo "AWS environment variables configured."
 
-      # Stap 5: Initialiseer OpenTofu
       - name: Run OpenTofu init
         run: tofu init
 
-      # Stap 6: Valideer de OpenTofu configuratie
       - name: Validate OpenTofu configuration
         run: tofu validate
 
-      # Stap 7: Pas de configuratie toe met OpenTofu
       - name: Apply OpenTofu configuration
+        env:
+          TF_LOG: DEBUG
         run: |
           tofu apply -auto-approve \
-            -var "aws_region=${{ env.AWS_REGION }}" \
-            -var "aws_access_key=${{ env.AWS_ACCESS_KEY_ID }}" \
-            -var "aws_secret_key=${{ env.AWS_SECRET_ACCESS_KEY }}" \
-            -var "aws_token=${{ env.AWS_SESSION_TOKEN }}"
+            -var "aws_region=${{ secrets.AWS_REGION }}" \
+            -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" \
+            -var "aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+            -var "aws_token=${{ secrets.AWS_SESSION_TOKEN }}"
