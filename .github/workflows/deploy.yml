@@ -9,6 +9,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    # Standaard repository-variabelen op job-niveau instellen
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -31,7 +35,9 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        run: echo "AWS environment variables configured. Region: $AWS_REGION"
+        run: |
+          echo "AWS environment variables configured."
+          echo "Region: $AWS_REGION"
 
       - name: Run OpenTofu init
         env:
