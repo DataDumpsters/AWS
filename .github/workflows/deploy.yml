@@ -20,12 +20,6 @@ jobs:
           sudo systemctl enable --now snapd.socket
           sudo snap install opentofu --classic
 
-      - name: Verify snap installation path
-        run: |
-          echo "Snap bin path: $PATH"  # Debugging de path
-          echo "/snap/bin" >> $GITHUB_PATH
-          ls /snap/bin  # Bekijk of tofu daar aanwezig is
-
       - name: Verify OpenTofu installation
         run: |
           which tofu  # Controleer of tofu gevonden kan worden in het pad
