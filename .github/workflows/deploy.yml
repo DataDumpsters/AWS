@@ -1,8 +1,10 @@
+name: Deploy to AWS with OpenTofu
+
 on:
   push:
     branches:
       - main
-  workflow_dispatch:  # Dit maakt de destroy job handmatig triggerbaar
+  workflow_dispatch:  # Handmatige trigger voor de destroy job
 
 jobs:
   deploy:
@@ -64,12 +66,9 @@ jobs:
   destroy:
     runs-on: ubuntu-latest
     needs: deploy  # Zorgt ervoor dat destroy alleen mogelijk is na een succesvolle deploy
-    if: ${{ github.event_name == 'workflow_dispatch' }}  # Alleen handmatig uitvoeren via workflow_dispatch
-    env:
-      AWS_REGION: ${{ vars.AWS_REGION }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}  # Alleen handmatig uitvoeren
+    environment:
+      name: ${{ vars.AWS_REGION }}
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -85,6 +84,16 @@ jobs:
         run: |
           which tofu
           tofu --version
+
+      - name: Configure AWS credentials for destroy
+        env:
+          AWS_REGION: ${{ env.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        run: |
+          echo "AWS environment variables configured for destroy."
+          echo "Region: $AWS_REGION"
 
       - name: Run OpenTofu destroy
         env:
