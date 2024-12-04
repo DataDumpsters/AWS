@@ -27,24 +27,32 @@ jobs:
 
       - name: Configure AWS credentials
         env:
-          AWS_REGION: "us-east-1"
+          AWS_REGION: ${{ vars.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        run: echo "AWS environment variables configured."
+        run: echo "AWS environment variables configured. Region: $AWS_REGION"
 
       - name: Run OpenTofu init
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
         run: tofu init
 
       - name: Validate OpenTofu configuration
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
         run: tofu validate
 
       - name: Apply OpenTofu configuration
         env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
           TF_LOG: DEBUG
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: |
           tofu apply -auto-approve \
-            -var "aws_region=${{ secrets.AWS_REGION }}" \
+            -var "aws_region=${{ vars.AWS_REGION }}" \
             -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" \
             -var "aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
             -var "aws_token=${{ secrets.AWS_SESSION_TOKEN }}"
