@@ -4,59 +4,34 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: # Zorgt ervoor dat de destroy-stap handmatig kan worden getriggerd
+  workflow_dispatch:  # Handmatige trigger voor de destroy job
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    # Standaard repository-variabelen op job-niveau instellen
-    env:
-      AWS_REGION: ${{ vars.AWS_REGION }}
-
     steps:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Install snapd and OpenTofu
+      - name: Install OpenTofu
         run: |
           sudo apt-get update
           sudo apt-get install -y snapd
-          sudo systemctl enable --now snapd.socket
           sudo snap install opentofu --classic
 
-      - name: Verify OpenTofu installation
-        run: |
-          which tofu
-          tofu --version
-
       - name: Configure AWS credentials
-        env:
-          AWS_REGION: ${{ env.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        run: echo "AWS environment variables configured."
+
+      - name: Run OpenTofu init and apply
         run: |
-          echo "AWS environment variables configured."
-          echo "Region: $AWS_REGION"
-
-      - name: Run OpenTofu init
-        env:
-          AWS_REGION: ${{ env.AWS_REGION }}
-        run: tofu init
-
-      - name: Validate OpenTofu configuration
-        env:
-          AWS_REGION: ${{ env.AWS_REGION }}
-        run: tofu validate
-
-      - name: Apply OpenTofu configuration
-        env:
-          AWS_REGION: ${{ env.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        run: |
+          tofu init
           tofu apply -auto-approve \
             -var "aws_region=${{ env.AWS_REGION }}" \
             -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" \
@@ -65,38 +40,25 @@ jobs:
 
   destroy:
     runs-on: ubuntu-latest
-    needs: deploy # Optioneel: zorgt ervoor dat destroy alleen mogelijk is na een succesvolle deploy
-
-    # Standaard repository-variabelen op job-niveau instellen
-    env:
-      AWS_REGION: ${{ vars.AWS_REGION }}
+    needs: deploy  # Zorgt ervoor dat destroy alleen mogelijk is na een succesvolle deploy
+    if: ${{ github.event_name == 'workflow_dispatch' }}  # Alleen handmatig uitvoeren
+    environment:
+      name: ${{ secrets.AWS_REGION }}
+      action: stop
 
     steps:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Install snapd and OpenTofu
+      - name: Install OpenTofu
         run: |
           sudo apt-get update
           sudo apt-get install -y snapd
-          sudo systemctl enable --now snapd.socket
           sudo snap install opentofu --classic
 
-      - name: Configure AWS credentials
-        env:
-          AWS_REGION: ${{ env.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        run: echo "AWS environment variables configured for destroy."
-
-      - name: Destroy OpenTofu configuration
-        env:
-          AWS_REGION: ${{ env.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+      - name: Run OpenTofu destroy
         run: |
+          tofu init  # Zorgt ervoor dat de lockbestanden correct worden bijgewerkt
           tofu destroy \
             -var "aws_region=${{ env.AWS_REGION }}" \
             -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" \
