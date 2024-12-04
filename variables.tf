@@ -9,9 +9,7 @@ variable "aws_token" {}
 # variable "AWS_ECR_ENDPOINT" {}
 
 #basics
-variable "aws_region" {
-    default = "us-east-1"
-}
+variable "aws_region" {}
 #variable for the naming of the VPC
 variable "DD-vpc" {
     default = "DD-vpc"
