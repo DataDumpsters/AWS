@@ -62,7 +62,7 @@ jobs:
 
       # Toevoeging: Upload de Terraform state file
       - name: Upload Terraform state as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: terraform-state
           path: terraform.tfstate
@@ -95,7 +95,7 @@ jobs:
 
       # Toevoeging: Download de Terraform state file
       - name: Download Terraform state
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: terraform-state
 
