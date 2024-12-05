@@ -77,9 +77,17 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
 
-    steps:
+    steps: 
+      
+      - name: Debug output
+        run: | 
+          echo "GitHub event: ${{ github.event_name }}"
+
+
       - name: Check out code
         uses: actions/checkout@v3
+
+      
 
       - name: Install snapd and OpenTofu
         run: |
