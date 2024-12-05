@@ -108,8 +108,8 @@ jobs:
           name: terraform-state
 
       # Toevoeging: Verplaats state file naar de juiste locatie
-      - name: Move state file to working directory
-        run: mv terraform.tfstate .
+      #- name: Move state file to working directory
+        #run: mv terraform.tfstate .
 
       - name: Run OpenTofu destroy
         env:
