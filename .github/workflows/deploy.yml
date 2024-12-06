@@ -63,7 +63,7 @@ jobs:
       # Toevoeging: Upload de Terraform state file
       - name: Upload Terraform state as artifact
         run: | 
-          aws s3 cp terraform.tfstate s3://bucket-datadumpsters/path/to/terraform.tfstate
+          aws s3 cp terraform.tfstate s3://bucket-datadumpsters/terraform.tfstate
         env:
           AWS_REGION: ${{ env.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -73,7 +73,7 @@ jobs:
 
   destroy:
     runs-on: ubuntu-latest
-    #needs: deploy  # Zorgt ervoor dat destroy alleen mogelijk is na een succesvolle deploy
+    needs: deploy  # Zorgt ervoor dat destroy alleen mogelijk is na een succesvolle deploy
     if: ${{ github.event_name == 'workflow_dispatch' }}  # Alleen handmatig uitvoeren via workflow_dispatch
     env:
       AWS_REGION: ${{ vars.AWS_REGION }}
@@ -108,7 +108,7 @@ jobs:
       # Toevoeging: Download de Terraform state file
       - name: Download Terraform state
         run: |
-          aws s3 cp s3://bucket-datadumpsters/path/to/terraform.tfstate terraform.tfstate
+          aws s3 cp s3://bucket-datadumpsters/terraform.tfstate terraform.tfstate
         env:
           AWS_REGION: ${{ env.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
