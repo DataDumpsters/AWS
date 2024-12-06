@@ -106,10 +106,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: terraform-state
+          path: terraform.tfstate
 
       # Toevoeging: Verplaats state file naar de juiste locatie
-      - name: Move state file to working directory
-        run: mv terraform.tfstate .
+      #- name: Move state file to working directory
+        #run: mv terraform.tfstate .
 
       - name: Run OpenTofu destroy
         env:
