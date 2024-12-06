@@ -1,0 +1,57 @@
+name: Destroy AWS Environment
+
+on:
+  workflow_dispatch:  # Handmatige trigger
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+
+    steps:
+      - name: Debug output
+        run: echo "Workflow triggered manually for destroy"
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Install snapd and OpenTofu
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y snapd
+          sudo systemctl enable --now snapd.socket
+          sudo snap install opentofu --classic
+
+      - name: Verify OpenTofu installation
+        run: |
+          which tofu
+          tofu --version
+
+      # Download de Terraform state file die eerder als artifact is geüpload
+      - name: Download Terraform state
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-state
+
+      # Verplaats de state file naar de juiste locatie
+      #- name: Move state file to working directory
+        #run: mv terraform.tfstate .
+
+      # Destroy job met OpenTofu
+      - name: Run OpenTofu destroy
+        env:
+          AWS_REGION: ${{ env.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        run: |
+          tofu init  # Zorgt ervoor dat lockbestanden en configuratie zijn bijgewerkt
+          tofu destroy -auto-approve \
+            -var "aws_region=${{ env.AWS_REGION }}" \
+            -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" \
+            -var "aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+            -var "aws_token=${{ secrets.AWS_SESSION_TOKEN }}"
