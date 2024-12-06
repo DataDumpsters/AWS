@@ -118,7 +118,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: |
-          tofu init  
+          
           tofu destroy -auto-approve \
             -var "aws_region=${{ env.AWS_REGION }}" \
             -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" \
