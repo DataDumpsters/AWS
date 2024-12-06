@@ -66,7 +66,6 @@ jobs:
 
       # Initialize OpenTofu (only if no statefile exists)
       - name: Run OpenTofu init
-        if: ${{ env.exists == 'false' }}
         env:
           AWS_REGION: ${{ env.AWS_REGION }}
         run: tofu init
