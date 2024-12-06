@@ -26,14 +26,14 @@ resource "aws_vpc" "DD-vpc" {
 #     }
 # }
 
-# resource "aws_subnet" "PrivateSubnet1" {
-#     vpc_id = aws_vpc.LE-vpc.id
-#     cidr_block = var.PrivateSubnet1_CIDR
-#     availability_zone = "us-east-1a"
-#     tags = {
-#         Name = "PrivateSubnet1"
-#     }
-# }
+ resource "aws_subnet" "PrivateSubnetDatadumpsters" {
+     vpc_id = aws_vpc.DD-vpc.id
+     cidr_block = var.PrivateSubnet1_CIDR
+     availability_zone = "us-east-1a"
+     tags = {
+        Name = "PrivateSubnetDatadumpsters"
+     }
+ }
 
 # resource "aws_subnet" "PrivateSubnet2" {
 #     vpc_id = aws_vpc.LE-vpc.id
