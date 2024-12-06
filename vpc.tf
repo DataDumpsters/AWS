@@ -1,6 +1,6 @@
 #Creating the VPC
 
-resource "aws_vpc" "LE-vpc" {
+resource "aws_vpc" "DD-vpc" {
     cidr_block = var.DD-vpc-CIDR
     tags = {
         Name = var.DD-vpc
