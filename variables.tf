@@ -72,9 +72,9 @@ variable "PrivateSubnet1_CIDR" {
      description = "All IPs on the internet"
  }
  #The execution policy
- variable "AWS_LABROLE_ARN" {
-   description = "the arn of my labrole execution role"
- }
- variable "name_db" {
-   default = "ledb"
- }
+ #variable "AWS_LABROLE_ARN" {
+   #description = "the arn of my labrole execution role"
+ #}
+ #variable "name_db" {
+   #default = "ledb"
+ #}
