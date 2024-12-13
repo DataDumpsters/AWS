@@ -210,27 +210,27 @@ resource "aws_route_table_association" "d" {
 # }
 
 # #Security group for RDS access
-# resource "aws_security_group" "RDS-sg" {
-#   name = "DD-RDS-sg"
-#   description = "Allow database access"
-#   vpc_id = aws_vpc.DD-vpc.id
+resource "aws_security_group" "RDS-sg" {
+  name = "DD-RDS-sg"
+  description = "Allow database access"
+  vpc_id = aws_vpc.DD-vpc.id
 
-#   ingress {
-#     from_port = 3306
-#     to_port = 3306
-#     protocol = "tcp"
-#     cidr_blocks = [ aws_vpc.DD-vpc.cidr_block ]
-#   }
-#   egress {
-#     from_port = 0
-#     to_port = 0
-#     protocol = "-1"
-#     cidr_blocks = [ "0.0.0.0/0" ]
-#   }
-#   tags = {
-#     Name = "DD-RDS-sg"
-#   }
-# }
+  ingress {
+    from_port = 3306
+    to_port = 3306
+    protocol = "tcp"
+    cidr_blocks = [ aws_vpc.DD-vpc.cidr_block ]
+  }
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = [ "0.0.0.0/0" ]
+  }
+  tags = {
+    Name = "DD-RDS-sg"
+  }
+}
 
 # #Security group for our tasks
 # resource "aws_security_group" "le_task_sg" {

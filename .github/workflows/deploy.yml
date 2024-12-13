@@ -13,7 +13,7 @@ jobs:
     env:
       AWS_REGION: ${{ vars.AWS_REGION }}
 
-    steps:
+     steps:
       - name: Check out code
         uses: actions/checkout@v3
 
@@ -36,7 +36,35 @@ jobs:
         run: |
           echo "AWS environment variables configured."
           echo "Region: $AWS_REGION"
+      # Check if statefile exists in S3 bucket
+      - name: Check if Terraform statefile exists
+        id: check_state
+        run: |
+          if aws s3 ls s3://lorenzobucket100/terraform.tfstate; then
+            echo "exists=true" >> $GITHUB_ENV
+          else
+            echo "exists=false" >> $GITHUB_ENV
+          fi
+        env:
+          AWS_REGION: ${{ env.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+
+      # Download statefile if it exists
+      - name: Download Terraform statefile
+        if: ${{ env.exists == 'true' }}
+        run: |
+          aws s3 cp s3://lorenzobucket100/terraform.tfstate terraform.tfstate
+        env:
+          AWS_REGION: ${{ env.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+
+      # Initialize OpenTofu (only if no statefile exists)
       - name: Run OpenTofu init
+        if: ${{ env.exists == 'false' }}
         env:
           AWS_REGION: ${{ env.AWS_REGION }}
         run: tofu init
