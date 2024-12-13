@@ -7,94 +7,93 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
     if: ${{ github.event_name != 'workflow_dispatch' }}
-    
+    runs-on: ubuntu-latest
     env:
       AWS_REGION: ${{ vars.AWS_REGION }}
 
-     steps:
-      - name: Check out code
-        uses: actions/checkout@v3
+    steps:
+     - name: Check out code
+       uses: actions/checkout@v3
 
-      - name: Install snapd and OpenTofu
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y snapd
-          sudo systemctl enable --now snapd.socket
-          sudo snap install opentofu --classic
-      - name: Verify OpenTofu installation
-        run: |
-          which tofu
-          tofu --version
-      - name: Configure AWS credentials
-        env:
-          AWS_REGION: ${{ env.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        run: |
-          echo "AWS environment variables configured."
-          echo "Region: $AWS_REGION"
+     - name: Install snapd and OpenTofu
+       run: |
+         sudo apt-get update
+         sudo apt-get install -y snapd
+         sudo systemctl enable --now snapd.socket
+         sudo snap install opentofu --classic
+     - name: Verify OpenTofu installation
+       run: |
+        which tofu
+        tofu --version
+     - name: Configure AWS credentials
+       env:
+         AWS_REGION: ${{ env.AWS_REGION }}
+         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+         AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+       run: |
+         echo "AWS environment variables configured."
+         echo "Region: $AWS_REGION"
       # Check if statefile exists in S3 bucket
-      - name: Check if Terraform statefile exists
-        id: check_state
-        run: |
-          if aws s3 ls s3://lorenzobucket100/terraform.tfstate; then
-            echo "exists=true" >> $GITHUB_ENV
-          else
-            echo "exists=false" >> $GITHUB_ENV
-          fi
-        env:
-          AWS_REGION: ${{ env.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+     - name: Check if Terraform statefile exists
+       id: check_state
+       run: |
+         if aws s3 ls s3://lorenzobucket100/terraform.tfstate; then
+           echo "exists=true" >> $GITHUB_ENV
+         else
+           echo "exists=false" >> $GITHUB_ENV
+         fi
+       env:
+         AWS_REGION: ${{ env.AWS_REGION }}
+         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+         AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
 
       # Download statefile if it exists
-      - name: Download Terraform statefile
-        if: ${{ env.exists == 'true' }}
-        run: |
-          aws s3 cp s3://lorenzobucket100/terraform.tfstate terraform.tfstate
-        env:
-          AWS_REGION: ${{ env.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+     - name: Download Terraform statefile
+       if: ${{ env.exists == 'true' }}
+       run: |
+         aws s3 cp s3://lorenzobucket100/terraform.tfstate terraform.tfstate
+       env:
+         AWS_REGION: ${{ env.AWS_REGION }}
+         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+         AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
 
       # Initialize OpenTofu (only if no statefile exists)
-      - name: Run OpenTofu init
-        if: ${{ env.exists == 'false' }}
-        env:
-          AWS_REGION: ${{ env.AWS_REGION }}
-        run: tofu init
+     - name: Run OpenTofu init
+       if: ${{ env.exists == 'false' }}
+       env:
+         AWS_REGION: ${{ env.AWS_REGION }}
+       run: tofu init
 
-      - name: Validate OpenTofu configuration
-        env:
-          AWS_REGION: ${{ env.AWS_REGION }}
-        run: tofu validate
+     - name: Validate OpenTofu configuration
+       env:
+         AWS_REGION: ${{ env.AWS_REGION }}
+       run: tofu validate
 
-      - name: Apply OpenTofu configuration
-        env:
-          AWS_REGION: ${{ env.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        run: |
-          tofu apply -auto-approve \
-            -var "aws_region=${{ env.AWS_REGION }}" \
-            -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" \
-            -var "aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
-            -var "aws_token=${{ secrets.AWS_SESSION_TOKEN }}"
+     - name: Apply OpenTofu configuration
+       env:
+         AWS_REGION: ${{ env.AWS_REGION }}
+         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+         AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+       run: |
+         tofu apply -auto-approve \
+           -var "aws_region=${{ env.AWS_REGION }}" \
+           -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" \
+           -var "aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+           -var "aws_token=${{ secrets.AWS_SESSION_TOKEN }}"
       # Toevoeging: Upload de Terraform state file
-      - name: Upload Terraform state as artifact
-        run: | 
-          aws s3 cp terraform.tfstate s3://lorenzobucket100/terraform.tfstate
-        env:
-          AWS_REGION: ${{ env.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+     - name: Upload Terraform state as artifact
+       run: | 
+         aws s3 cp terraform.tfstate s3://lorenzobucket100/terraform.tfstate
+       env:
+         AWS_REGION: ${{ env.AWS_REGION }}
+         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+         AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
 
 
   destroy:
