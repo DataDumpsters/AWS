@@ -9,7 +9,7 @@ resource "aws_vpc" "DD-vpc" {
 
 #Creating two public and four private subnets
 resource "aws_subnet" "PublicSubnet1" {
-    vpc_id = aws_vpc.LE-vpc.id
+    vpc_id = aws_vpc.DD-vpc.id
     cidr_block = var.PublicSubnet1_CIDR
     availability_zone = "us-east-1a"
     tags = {
@@ -18,7 +18,7 @@ resource "aws_subnet" "PublicSubnet1" {
 }
 
 # resource "aws_subnet" "PublicSubnet2" {
-#     vpc_id = aws_vpc.LE-vpc.id
+#     vpc_id = aws_vpc.DD-vpc.id
 #     cidr_block = var.PublicSubnet2_CIDR
 #     availability_zone = "us-east-1b"
 #     tags = {
@@ -35,7 +35,7 @@ resource "aws_subnet" "PrivateSubnetDatadumpsters" {
     }
 }
 # resource "aws_subnet" "PrivateSubnet2" {
-#     vpc_id = aws_vpc.LE-vpc.id
+#     vpc_id = aws_vpc.DD-vpc.id
 #     cidr_block = var.PrivateSubnet2_CIDR
 #     availability_zone = "us-east-1b"
 #     tags = {
@@ -44,7 +44,7 @@ resource "aws_subnet" "PrivateSubnetDatadumpsters" {
 # }
 
 resource "aws_subnet" "PrivateSubnet3" {
-    vpc_id = aws_vpc.LE-vpc.id
+    vpc_id = aws_vpc.DD-vpc.id
     cidr_block = var.PrivateSubnet3_CIDR
     availability_zone = "us-east-1a"
     tags = {
@@ -53,7 +53,7 @@ resource "aws_subnet" "PrivateSubnet3" {
 }
 
  #resource "aws_subnet" "PrivateSubnet4" {
-#     vpc_id = aws_vpc.LE-vpc.id
+#     vpc_id = aws_vpc.DD-vpc.id
 #     cidr_block = var.PrivateSubnet4_CIDR
 #     availability_zone = "us-east-1b"
 #     tags = {
@@ -63,7 +63,7 @@ resource "aws_subnet" "PrivateSubnet3" {
 
 #internet gateway for the public subnets
 resource "aws_internet_gateway" "LE-igw" {
-    vpc_id = aws_vpc.LE-vpc.id
+    vpc_id = aws_vpc.DD-vpc.id
     tags = {
         Name = var.igw
     }
@@ -71,7 +71,7 @@ resource "aws_internet_gateway" "LE-igw" {
 
 
 # #Create NAT Gateway 1 for Availability Zone A
-resource "aws_nat_gateway" "LE-vpc-NATGateway1" {
+resource "aws_nat_gateway" "DD-vpc-NATGateway1" {
     allocation_id = aws_eip.LE-EIP1.id
     depends_on = [aws_internet_gateway.LE-igw, aws_eip.LE-EIP1]
     subnet_id = aws_subnet.PublicSubnet1.id
@@ -89,7 +89,7 @@ resource "aws_eip" "LE-EIP1" {
 } 
 
 # #Create NAT Gateway 2 for Availability Zone B
-# resource "aws_nat_gateway" "LE-vpc-NATGateway2" {
+# resource "aws_nat_gateway" "DD-vpc-NATGateway2" {
 #     allocation_id = aws_eip.LE-EIP2.id
 #     depends_on = [aws_internet_gateway.LE-igw, aws_eip.LE-EIP2]
 #     subnet_id = aws_subnet.PublicSubnet2.id
@@ -108,7 +108,7 @@ resource "aws_eip" "LE-EIP1" {
 
 # #Create Public Route Table 
 resource "aws_route_table" "PublicRouteTable" {
-    vpc_id = aws_vpc.LE-vpc.id
+    vpc_id = aws_vpc.DD-vpc.id
     route {
             cidr_block = var.all_IPs
             gateway_id = aws_internet_gateway.LE-igw.id
@@ -131,11 +131,11 @@ resource "aws_route_table_association" "a" {
 
 # #Create Private Route Table 
 resource "aws_route_table" "PrivateRouteTable1" {
-    vpc_id = aws_vpc.LE-vpc.id
+    vpc_id = aws_vpc.DD-vpc.id
     #
     route {
             cidr_block = var.all_IPs
-            gateway_id = aws_nat_gateway.LE-vpc-NATGateway1.id
+            gateway_id = aws_nat_gateway.DD-vpc-NATGateway1.id
         }
     tags = {
         Name = "PrivateRouteTable1"
@@ -143,11 +143,11 @@ resource "aws_route_table" "PrivateRouteTable1" {
 }
 # #Create Private Route Table 2
 # resource "aws_route_table" "PrivateRouteTable2" {
-#     vpc_id = aws_vpc.LE-vpc.id
+#     vpc_id = aws_vpc.DD-vpc.id
 #     #
 #     route {
 #             cidr_block = var.all_IPs
-#             gateway_id = aws_nat_gateway.LE-vpc-NATGateway2.id
+#             gateway_id = aws_nat_gateway.DD-vpc-NATGateway2.id
 #         }
 #     tags = {
 #         Name = "PrivateRouteTable2"
@@ -182,7 +182,7 @@ resource "aws_route_table_association" "d" {
 # resource "aws_security_group" "alb_sg" {
 #   name        = "le-alb-sg"
 #   description = "Security group for ALB"
-#   vpc_id = aws_vpc.LE-vpc.id
+#   vpc_id = aws_vpc.DD-vpc.id
 
 #   ingress {
 #     from_port   = 80
@@ -213,13 +213,13 @@ resource "aws_route_table_association" "d" {
 # resource "aws_security_group" "RDS-sg" {
 #   name = "le-RDS-sg"
 #   description = "Allow database access"
-#   vpc_id = aws_vpc.LE-vpc.id
+#   vpc_id = aws_vpc.DD-vpc.id
 
 #   ingress {
 #     from_port = 3306
 #     to_port = 3306
 #     protocol = "tcp"
-#     cidr_blocks = [ aws_vpc.LE-vpc.cidr_block ]
+#     cidr_blocks = [ aws_vpc.DD-vpc.cidr_block ]
 #   }
 #   egress {
 #     from_port = 0
@@ -237,27 +237,27 @@ resource "aws_route_table_association" "d" {
 #   name        = "le_task_sg" 
 #   description = "Security group for the ECS tasks"
 
-#   vpc_id = aws_vpc.LE-vpc.id
+#   vpc_id = aws_vpc.DD-vpc.id
 
 #   ingress {
 #     from_port   = 80
 #     to_port     = 80
 #     protocol    = "tcp"
-#     cidr_blocks = [ aws_vpc.LE-vpc.cidr_block ]
+#     cidr_blocks = [ aws_vpc.DD-vpc.cidr_block ]
 #   }
   
 #   ingress {
 #     from_port   = 443
 #     to_port     = 443
 #     protocol    = "tcp"
-#     cidr_blocks = [ aws_vpc.LE-vpc.cidr_block ]
+#     cidr_blocks = [ aws_vpc.DD-vpc.cidr_block ]
 #   }
   
 #   ingress {
 #     from_port   = 3306
 #     to_port     = 3306
 #     protocol    = "tcp"
-#     cidr_blocks = [ aws_vpc.LE-vpc.cidr_block ]
+#     cidr_blocks = [ aws_vpc.DD-vpc.cidr_block ]
 #   } 
 
 #   egress {
@@ -277,7 +277,7 @@ resource "aws_route_table_association" "d" {
 # resource "aws_security_group" "Bastion-sg" {
 #   name = "le-Bastion-sg"
 #   description = "Allow ssh to bastion host"
-#   vpc_id = aws_vpc.LE-vpc.id
+#   vpc_id = aws_vpc.DD-vpc.id
 
 #   ingress {
 #     description = "Allow ssh to the bastion host"
