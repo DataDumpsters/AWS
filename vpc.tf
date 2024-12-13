@@ -130,7 +130,7 @@ resource "aws_route_table_association" "a" {
 # }
 
 # #Create Private Route Table 
-resource "aws_route_table" "PrivateRouteTable1" {
+resource "aws_route_table" "PrivateRouteTableDatadumpsters1" {
     vpc_id = aws_vpc.DD-vpc.id
     #
     route {
@@ -138,11 +138,11 @@ resource "aws_route_table" "PrivateRouteTable1" {
             gateway_id = aws_nat_gateway.DD-vpc-NATGateway1.id
         }
     tags = {
-        Name = "PrivateRouteTable1"
+        Name = "PrivateRouteTableDatadumpsters1"
     }
 }
 # #Create Private Route Table 2
-# resource "aws_route_table" "PrivateRouteTable2" {
+# resource "aws_route_table" "PrivateRouteTableDatadumpsters2" {
 #     vpc_id = aws_vpc.DD-vpc.id
 #     #
 #     route {
@@ -150,31 +150,31 @@ resource "aws_route_table" "PrivateRouteTable1" {
 #             gateway_id = aws_nat_gateway.DD-vpc-NATGateway2.id
 #         }
 #     tags = {
-#         Name = "PrivateRouteTable2"
+#         Name = "PrivateRouteTableDatadumpsters2"
 #     }
 # }
 # #Associate PrivateSubnet1 with Private Route Table
 resource "aws_route_table_association" "c" {
     subnet_id = aws_subnet.PrivateSubnetDatadumpsters.id
-    route_table_id = aws_route_table.PrivateRouteTable1.id
+    route_table_id = aws_route_table.PrivateRouteTableDatadumpsters1.id
 }
 
 # #Associate PrivateSubnet2 with Private Route Table
 resource "aws_route_table_association" "d" {
     subnet_id = aws_subnet.PrivateSubnetDatadumpsters2.id
-    route_table_id = aws_route_table.PrivateRouteTable2.id
+    route_table_id = aws_route_table.PrivateRouteTableDatadumpsters2.id
 }
 
 # #Associate PrivateSubnet3 with Private Route Table
 # resource "aws_route_table_association" "e" {
 #     subnet_id = aws_subnet.PrivateSubnet3.id
-#     route_table_id = aws_route_table.PrivateRouteTable1.id
+#     route_table_id = aws_route_table.PrivateRouteTableDatadumpsters1.id
 # }
 
 # #Associate PrivateSubnet4 with Private Route Table
 # resource "aws_route_table_association" "f" {
 #     subnet_id = aws_subnet.PrivateSubnet4.id
-#     route_table_id = aws_route_table.PrivateRouteTable2.id
+#     route_table_id = aws_route_table.PrivateRouteTableDatadumpsters2.id
 # }
 
 # #Security groups configurations
