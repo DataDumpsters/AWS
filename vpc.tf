@@ -142,17 +142,17 @@ resource "aws_route_table" "PrivateRouteTableDatadumpsters1" {
     }
 }
 # #Create Private Route Table 2
-# resource "aws_route_table" "PrivateRouteTableDatadumpsters2" {
-#     vpc_id = aws_vpc.DD-vpc.id
-#     #
-#     route {
-#             cidr_block = var.all_IPs
-#             gateway_id = aws_nat_gateway.DD-vpc-NATGateway2.id
-#         }
-#     tags = {
-#         Name = "PrivateRouteTableDatadumpsters2"
-#     }
-# }
+resource "aws_route_table" "PrivateRouteTableDatadumpsters2" {
+    vpc_id = aws_vpc.DD-vpc.id
+    #
+    route {
+            cidr_block = var.all_IPs
+            gateway_id = aws_nat_gateway.DD-vpc-NATGateway2.id
+        }
+    tags = {
+        Name = "PrivateRouteTableDatadumpsters2"
+    }
+}
 # #Associate PrivateSubnet1 with Private Route Table
 resource "aws_route_table_association" "c" {
     subnet_id = aws_subnet.PrivateSubnetDatadumpsters.id
