@@ -42,7 +42,7 @@ jobs:
       - name: Check if Terraform statefile exists
         id: check_state
         run: |
-          if aws s3 ls s3:::lorenzobucket100/terraform.tfstate; then
+          if aws s3 ls s3://lorenzobucket100/terraform.tfstate; then
             echo "exists=true" >> $GITHUB_ENV
           else
             echo "exists=false" >> $GITHUB_ENV
@@ -57,7 +57,7 @@ jobs:
       - name: Download Terraform statefile
         if: ${{ env.exists == 'true' }}
         run: |
-          aws s3 cp s3:::lorenzobucket100/terraform.tfstate terraform.tfstate
+          aws s3 cp s3://lorenzobucket100/terraform.tfstate terraform.tfstate
         env:
           AWS_REGION: ${{ env.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -97,7 +97,7 @@ jobs:
       # Upload updated Terraform state file to S3
       - name: Upload Terraform statefile
         run: |
-          aws s3 cp terraform.tfstate s3:::lorenzobucket100/terraform.tfstate
+          aws s3 cp terraform.tfstate s3://lorenzobucket100/terraform.tfstate
         env:
           AWS_REGION: ${{ env.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
