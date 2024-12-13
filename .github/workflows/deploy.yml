@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - main
+      - LorenzoAWS
   workflow_dispatch:  # Dit maakt de destroy job handmatig triggerbaar
 
 jobs:
