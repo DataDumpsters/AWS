@@ -34,14 +34,14 @@ resource "aws_subnet" "PrivateSubnetDatadumpsters" {
        Name = "PrivateSubnetDatadumpsters"
     }
 }
-# resource "aws_subnet" "PrivateSubnetDatadumpsters2" {
-#     vpc_id = aws_vpc.DD-vpc.id
-#     cidr_block = var.PrivateSubnetDatadumpsters2_CIDR
-#     availability_zone = "us-east-1b"
-#     tags = {
-#         Name = "PrivateSubnetDatadumpsters2"
-#     }
-# }
+resource "aws_subnet" "PrivateSubnetDatadumpsters2" {
+    vpc_id = aws_vpc.DD-vpc.id
+    cidr_block = var.PrivateSubnetDatadumpsters2_CIDR
+    availability_zone = "us-east-1a"
+    tags = {
+        Name = "PrivateSubnetDatadumpsters2"
+    }
+}
 
 #resource "aws_subnet" "PrivateSubnet3" {
 #    vpc_id = aws_vpc.DD-vpc.id
@@ -144,10 +144,10 @@ resource "aws_route_table" "PrivateRouteTableDatadumpsters1" {
 # #Create Private Route Table 2
 resource "aws_route_table" "PrivateRouteTableDatadumpsters2" {
     vpc_id = aws_vpc.DD-vpc.id
-    #
+    
     route {
             cidr_block = var.all_IPs
-            gateway_id = aws_nat_gateway.DD-vpc-NATGateway2.id
+            gateway_id = aws_nat_gateway.DD-vpc-NATGateway1.id
         }
     tags = {
         Name = "PrivateRouteTableDatadumpsters2"
