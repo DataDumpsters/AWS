@@ -1,7 +1,7 @@
-# #Configuration cluster
-# resource "aws_ecs_cluster" "cluster" {
-#   name = "le_fargate_cluster2"
-# }
+#Configuration cluster
+ resource "aws_ecs_cluster" "cluster" {
+   name = "le_fargate_cluster2"
+ }
 
 # #Configuration task definition
 # resource "aws_ecs_task_definition" "task_definition" {
