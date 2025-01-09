@@ -38,7 +38,7 @@ jobs:
      - name: Check if Terraform statefile exists
        id: check_state
        run: |
-         if aws s3 ls s3://datadumpstersbucker/terraform.tfstate; then
+         if aws s3 ls arn:aws:s3:::datatumpstersbucker/terraform.tfstate; then
            echo "exists=true" >> $GITHUB_ENV
          else
            echo "exists=false" >> $GITHUB_ENV
@@ -53,7 +53,7 @@ jobs:
      - name: Download Terraform statefile
        if: ${{ env.exists == 'true' }}
        run: |
-         aws s3 cp s3://datadumpstersbucker/terraform.tfstate terraform.tfstate
+         aws s3 cp arn:aws:s3:::datatumpstersbucker/terraform.tfstate terraform.tfstate
        env:
          AWS_REGION: ${{ env.AWS_REGION }}
          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -87,7 +87,7 @@ jobs:
       # Toevoeging: Upload de Terraform state file
      - name: Upload Terraform state as artifact
        run: | 
-         aws s3 cp terraform.tfstate s3://datadumpstersbucker/terraform.tfstate
+         aws s3 cp terraform.tfstate arn:aws:s3:::datatumpstersbucker/terraform.tfstate
        env:
          AWS_REGION: ${{ env.AWS_REGION }}
          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -128,7 +128,7 @@ jobs:
       # Toevoeging: Download de Terraform state file
       - name: Download Terraform state
         run: |
-          aws s3 cp s3://datadumpstersbucker/terraform.tfstate terraform.tfstate 
+          aws s3 cp arn:aws:s3:::datatumpstersbucker/terraform.tfstate terraform.tfstate 
         env:
           AWS_REGION: ${{ env.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -154,7 +154,7 @@ jobs:
             -var "aws_token=${{ secrets.AWS_SESSION_TOKEN }}"
       - name: Download Terraform state
         run: |
-            aws s3 rm s3://datadumpstersbucker/terraform.tfstate 
+            aws s3 rm arn:aws:s3:::datatumpstersbucker/terraform.tfstate 
         env:
           AWS_REGION: ${{ env.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
