@@ -1,10 +1,10 @@
 #Creating the ECR repository
-resource "aws_ecr_repository" "my_repository" {
-  name = "le-repo"
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-}
+#resource "aws_ecr_repository" "my_repository" {
+#  name = "le-repo"
+#  image_scanning_configuration {
+#    scan_on_push = true
+#  }
+#}
 
 ##The ECR auth. token
 #data "aws_ecr_authorization_token" "token" {
