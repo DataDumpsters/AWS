@@ -1,11 +1,9 @@
 on:
   push:
     branches:
-      - main
-      - LorenzoAWS
       - WardAWS
   workflow_dispatch:  # Dit maakt de destroy job handmatig triggerbaar
-
+#test
 jobs:
   deploy:
     if: ${{ github.event_name != 'workflow_dispatch' }}
