@@ -33,8 +33,25 @@ Dit project is voor de hosting van de data registratie webapplicatie voor het Gl
 3. **Navigeren naar de Projectmap**:
    - Ga naar de map waar je het project hebt gekloond:
      ```bash
-     cd projectnaam
+     cd AWS
      ```
 4. **Variabelen Configureren voor AWS**:
    - Het is noodzakelijk om de variabelen van jou AWS omgeving in te stellen binnen github voor de github actions workflow.
    - De variabelen kan je veranderen in de AWS repo in github onder "Settings" > "Secrets and variables" > "Actions".
+
+5. **Pipeline Starten met GitHub Actions**:
+   - Voeg je wijzigingen toe en commit ze:
+     ```bash
+     git add .
+     git commit -m "Update configuration variables"
+     ```
+   - Push je wijzigingen naar je fork:
+     ```bash
+     git push origin *Naam branch*
+     ```
+   - De GitHub Actions workflow zal automatisch starten indien je een push doet naar een branch die staat vermeld in de "deploy.yml" op lijn 3 ("branches"). Je kunt de voortgang volgen via de "Actions" tab op GitHub.
+
+### Bijkomende info terraform documenten.
+
+In de "AWS" map kan je verschillende terraform bestanden vinden. Hier kan je naamwijzigingen doen als ook veranderingen maken in de architectuur van AWS. Aangezien dit project niet volledig af is moet dit uiteraard via terraform ook nog verder uitgebouwd worden.
+
