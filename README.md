@@ -55,3 +55,9 @@ Dit project is voor de hosting van de data registratie webapplicatie voor het Gl
 
 In de "AWS" map kan je verschillende terraform bestanden vinden. Hier kan je naamwijzigingen doen als ook veranderingen maken in de architectuur van AWS. Aangezien dit project niet volledig af is moet dit uiteraard via terraform ook nog verder uitgebouwd worden.
 
+### Notities
+
+- **Beveiliging**: Zorg ervoor dat je geen gevoelige informatie zoals AWS-sleutels in je commits plaatst.
+- **Updates**: De infrastructuur wordt beheerd door Terraform. Als je wijzigingen aanbrengt in de `.tf` bestanden, zorg er dan voor dat je deze goed test, want ze kunnen invloed hebben op de AWS-omgeving.
+
+
