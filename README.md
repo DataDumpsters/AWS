@@ -49,8 +49,8 @@ Dit project is voor de hosting van de data registratie webapplicatie voor het Gl
 
    - Log in op jouw AWS Console en navigeer naar de service "S3". Een bucket is een opslageenheid die dient om objecten (bestanden) te organiseren en op te slaan..
    - Klik op <strong>"Create Bucket"</strong> en stel de gewenste parameters in (naam, publieke toegankelijkheid of privé, etc.).
-   - Vervolgens navigeer je naar het "deploy.yml" bestand in je AWS folder en selecteer je de naam van de S3 bucket -> s3://<strong>bucketname</strong>/terraform.tfstate. Dan gebruik je de toetsencombinatie <strong>Ctrl + shift + L <strong/>.
-     Vervolgens geef je de naam van je aangemaakte bucket in. (De toetsencombinatie zorgt ervoor dat alles waar de bucketnaam nodig is wordt aangepast).
+   - Ga vervolgens naar het "deploy.yml" bestand in je AWS-map en selecteer de naam van de S3-bucket -> s3://<strong>bucketname</strong>/terraform.tfstate. Gebruik daarna de toetsencombinatie Ctrl + Shift + L. 
+     Vervolgens voer je de naam van je aangemaakte bucket in. (Deze toetsencombinatie zorgt ervoor dat overal waar de bucketnaam nodig is, deze wordt aangepast.)
     
 
 6. **Pipeline Starten met GitHub Actions**:
