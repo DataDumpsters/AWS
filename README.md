@@ -39,7 +39,21 @@ Dit project is voor de hosting van de data registratie webapplicatie voor het Gl
    - Het is noodzakelijk om de variabelen van jou AWS omgeving in te stellen binnen github voor de github actions workflow.
    - De variabelen kan je veranderen in de AWS repo in github onder "Settings" > "Secrets and variables" > "Actions".
 
-5. **Pipeline Starten met GitHub Actions**:
+5. **Bucket aanmaken in AWS Console voor de statefile**:
+   - Momenteel is het noodzakelijk om een bucket aan te maken voor de opslag van de statefile.
+   - Een statefile in AWS, vooral bij het gebruik van Infrastructure as Code (IaC) tools zoals Terraform, houdt de huidige staat van je infrastructuur bij. Hier is een korte beschrijving:
+
+     - Het houdt bij wat er in AWS is geïmplementeerd en wat de huidige configuratie is.
+     - Wanneer je wijzigingen aanbrengt in je configuratiebestanden, vergelijkt Terraform de gewenste staat (uit je code) met de werkelijke staat (uit de statefile) om te bepalen wat er moet worden toegevoegd, gewijzigd of verwijderd.
+     - Het zorgt ervoor dat de infrastructuur consistent blijft met wat gedefinieerd is in je code, door te voorkomen dat handmatige of ongedocumenteerde wijzigingen conflicteren met je IaC definities. 
+
+   - Log in op jouw AWS Console en navigeer naar de service "S3". Een bucket is een opslageenheid die dient om objecten (bestanden) te organiseren en op te slaan..
+   - Klik op <strong>"Create Bucket"</strong> en stel de gewenste parameters in (naam, publieke toegankelijkheid of privé, etc.).
+   - Vervolgens navigeer je naar het "deploy.yml" bestand in je AWS folder en selecteer je de naam van de S3 bucket -> s3://<strong>bucketname</strong>/terraform.tfstate. Dan gebruik je de toetsencombinatie <strong>Ctrl + shift + L <strong/>.
+     Vervolgens geef je de naam van je aangemaakte bucket in. (De toetsencombinatie zorgt ervoor dat alles waar de bucketnaam nodig is wordt aangepast).
+    
+
+6. **Pipeline Starten met GitHub Actions**:
    - Voeg je wijzigingen toe en commit ze:
      ```bash
      git add .
